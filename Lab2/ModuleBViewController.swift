@@ -22,6 +22,18 @@ class ModuleBViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
+        // start up the audio model here, querying microphone
+        audio.startMicrophoneProcessing(withFps: 10)
+        audio.startProcessingSinewaveForPlayback(withFreq: 1000)
+        audio.play()
+        
+    
+        // Do any additional setup after loading the view.
+    }
+    
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
 //        graph?.addGraph(withName: "fft",
 //                        shouldNormalize: true,
 //                        numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
@@ -30,20 +42,18 @@ class ModuleBViewController: UIViewController {
 //            shouldNormalize: false,
 //            numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE)
 //
-        
-        
-        // start up the audio model here, querying microphone
-        audio.startMicrophoneProcessing(withFps: 10)
-        audio.startProcessingSinewaveForPlayback(withFreq: 1000)
-        audio.play()
-        
 //        Timer.scheduledTimer(timeInterval: 0.05, target: self,
 //            selector: #selector(self.updateGraph),
 //            userInfo: nil,
 //            repeats: true)
-        // Do any additional setup after loading the view.
+//
+//    }
+//    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        audio.pause()
+        
     }
-    
     
     @IBOutlet weak var freqLabel: UILabel!
     

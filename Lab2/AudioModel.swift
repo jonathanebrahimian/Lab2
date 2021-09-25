@@ -97,6 +97,13 @@ class AudioModel {
         self.inputBuffer?.addNewFloatData(data, withNumSamples: Int64(numFrames))
     }
     
+    func pause() {
+        if let manager = self.audioManager {
+            manager.pause()
+            manager.outputBlock = nil
+        }
+    }
+    
     //==========================================
     // MARK: Private Methods
     
