@@ -15,6 +15,12 @@
 		552795A626FD97CF007587EB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 552795A426FD97CF007587EB /* LaunchScreen.storyboard */; };
 		552795AE26FD99BC007587EB /* ModuleAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 552795AD26FD99BC007587EB /* ModuleAViewController.swift */; };
 		552795B026FD99CA007587EB /* ModuleBViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 552795AF26FD99CA007587EB /* ModuleBViewController.swift */; };
+		AB5F8E4F26FE9D9900BC67BD /* Novocaine.m in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E4E26FE9D9900BC67BD /* Novocaine.m */; };
+		AB5F8E5326FE9E3C00BC67BD /* CircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5226FE9E3C00BC67BD /* CircularBuffer.m */; };
+		AB5F8E5626FE9E9300BC67BD /* AudioFileReader.m in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5526FE9E9300BC67BD /* AudioFileReader.m */; };
+		AB5F8E5926FE9EDD00BC67BD /* FFTHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5826FE9EDD00BC67BD /* FFTHelper.m */; };
+		AB5F8E5B26FE9F1400BC67BD /* MetalGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5A26FE9F1400BC67BD /* MetalGraph.swift */; };
+		AB5F8E5D26FE9F3500BC67BD /* AudioModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5C26FE9F3500BC67BD /* AudioModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +34,17 @@
 		552795A726FD97CF007587EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		552795AD26FD99BC007587EB /* ModuleAViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleAViewController.swift; sourceTree = "<group>"; };
 		552795AF26FD99CA007587EB /* ModuleBViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleBViewController.swift; sourceTree = "<group>"; };
+		AB5F8E4E26FE9D9900BC67BD /* Novocaine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Novocaine.m; sourceTree = "<group>"; };
+		AB5F8E5026FE9DB600BC67BD /* Novocaine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Novocaine.h; sourceTree = "<group>"; };
+		AB5F8E5126FE9E1900BC67BD /* CircularBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
+		AB5F8E5226FE9E3C00BC67BD /* CircularBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CircularBuffer.m; sourceTree = "<group>"; };
+		AB5F8E5426FE9E7200BC67BD /* AudioFileReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioFileReader.h; sourceTree = "<group>"; };
+		AB5F8E5526FE9E9300BC67BD /* AudioFileReader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioFileReader.m; sourceTree = "<group>"; };
+		AB5F8E5726FE9EC200BC67BD /* FFTHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFTHelper.h; sourceTree = "<group>"; };
+		AB5F8E5826FE9EDD00BC67BD /* FFTHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FFTHelper.m; sourceTree = "<group>"; };
+		AB5F8E5A26FE9F1400BC67BD /* MetalGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalGraph.swift; sourceTree = "<group>"; };
+		AB5F8E5C26FE9F3500BC67BD /* AudioModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioModel.swift; sourceTree = "<group>"; };
+		AB5F8E5F26FEA02A00BC67BD /* Lab2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lab2-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +86,17 @@
 				552795A226FD97CF007587EB /* Assets.xcassets */,
 				552795A426FD97CF007587EB /* LaunchScreen.storyboard */,
 				552795A726FD97CF007587EB /* Info.plist */,
+				AB5F8E4E26FE9D9900BC67BD /* Novocaine.m */,
+				AB5F8E5026FE9DB600BC67BD /* Novocaine.h */,
+				AB5F8E5126FE9E1900BC67BD /* CircularBuffer.h */,
+				AB5F8E5226FE9E3C00BC67BD /* CircularBuffer.m */,
+				AB5F8E5426FE9E7200BC67BD /* AudioFileReader.h */,
+				AB5F8E5526FE9E9300BC67BD /* AudioFileReader.m */,
+				AB5F8E5726FE9EC200BC67BD /* FFTHelper.h */,
+				AB5F8E5826FE9EDD00BC67BD /* FFTHelper.m */,
+				AB5F8E5A26FE9F1400BC67BD /* MetalGraph.swift */,
+				AB5F8E5C26FE9F3500BC67BD /* AudioModel.swift */,
+				AB5F8E5F26FEA02A00BC67BD /* Lab2-Bridging-Header.h */,
 			);
 			path = Lab2;
 			sourceTree = "<group>";
@@ -105,6 +133,7 @@
 				TargetAttributes = {
 					5527959526FD97CC007587EB = {
 						CreatedOnToolsVersion = 13.0;
+						LastSwiftMigration = 1300;
 					};
 				};
 			};
@@ -144,8 +173,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB5F8E5D26FE9F3500BC67BD /* AudioModel.swift in Sources */,
 				552795AE26FD99BC007587EB /* ModuleAViewController.swift in Sources */,
+				AB5F8E5626FE9E9300BC67BD /* AudioFileReader.m in Sources */,
 				5527959E26FD97CC007587EB /* ViewController.swift in Sources */,
+				AB5F8E5326FE9E3C00BC67BD /* CircularBuffer.m in Sources */,
+				AB5F8E5B26FE9F1400BC67BD /* MetalGraph.swift in Sources */,
+				AB5F8E4F26FE9D9900BC67BD /* Novocaine.m in Sources */,
+				AB5F8E5926FE9EDD00BC67BD /* FFTHelper.m in Sources */,
 				552795B026FD99CA007587EB /* ModuleBViewController.swift in Sources */,
 				5527959A26FD97CC007587EB /* AppDelegate.swift in Sources */,
 				5527959C26FD97CC007587EB /* SceneDelegate.swift in Sources */,
@@ -295,6 +330,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 87NPWNTFX6;
@@ -313,6 +349,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.Jonathan.Lab2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Lab2/Lab2-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -323,6 +361,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 87NPWNTFX6;
@@ -341,6 +380,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.Jonathan.Lab2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Lab2/Lab2-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -127,28 +127,27 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Movement" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JdR-2F-4v1">
-                                <rect key="frame" x="167" y="678" width="81" height="21"/>
+                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1000" minValue="15" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="Srk-WC-YcI">
+                                <rect key="frame" x="58" y="643" width="298" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="changeFrequency:" destination="Zi3-ag-Yij" eventType="valueChanged" id="b3t-De-eiA"/>
+                                </connections>
+                            </slider>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Frequency: 1000" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ulb-7p-vTL">
+                                <rect key="frame" x="82" y="506" width="249" height="49"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="CUA-Hu-SJk">
-                                <rect key="frame" x="18" y="741" width="378" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <connections>
-                                    <action selector="sliderChanged:" destination="Zi3-ag-Yij" eventType="valueChanged" id="Phr-cK-lqX"/>
-                                </connections>
-                            </slider>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="3fy-vT-s8Y"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="XXk-tH-g7d"/>
                     <connections>
-                        <outlet property="movementLabel" destination="JdR-2F-4v1" id="gAU-aJ-Gpq"/>
-                        <outlet property="slider" destination="CUA-Hu-SJk" id="Lgj-vz-c4M"/>
+                        <outlet property="freqLabel" destination="Ulb-7p-vTL" id="2Qs-rp-pKb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HtD-8L-hBz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
