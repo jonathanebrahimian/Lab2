@@ -38,9 +38,13 @@ class ModuleBViewController: UIViewController {
                         shouldNormalize: true,
                         numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
 
-        graph?.addGraph(withName: "time",
-            shouldNormalize: false,
-            numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE)
+//        graph?.addGraph(withName: "time",
+//            shouldNormalize: false,
+//            numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE)
+        
+        graph?.addGraph(withName: "peak",
+            shouldNormalize: true,
+            numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/10)
 
         Timer.scheduledTimer(timeInterval: 0.05, target: self,
             selector: #selector(self.updateGraph),
@@ -71,10 +75,17 @@ class ModuleBViewController: UIViewController {
             forKey: "fft"
         )
         
+//        self.graph?.updateGraph(
+//            data: self.audio.timeData,
+//            forKey: "time"
+//        )
+        
         self.graph?.updateGraph(
-            data: self.audio.timeData,
-            forKey: "time"
+            data: self.audio.peakData,
+            forKey: "peak"
         )
+        
+        
         
         
         
