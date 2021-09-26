@@ -21,6 +21,7 @@
 		AB5F8E5926FE9EDD00BC67BD /* FFTHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5826FE9EDD00BC67BD /* FFTHelper.m */; };
 		AB5F8E5B26FE9F1400BC67BD /* MetalGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5A26FE9F1400BC67BD /* MetalGraph.swift */; };
 		AB5F8E5D26FE9F3500BC67BD /* AudioModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E5C26FE9F3500BC67BD /* AudioModel.swift */; };
+		AB5F8E6326FFF8D400BC67BD /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB5F8E6226FFF8D400BC67BD /* Shaders.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		AB5F8E5A26FE9F1400BC67BD /* MetalGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalGraph.swift; sourceTree = "<group>"; };
 		AB5F8E5C26FE9F3500BC67BD /* AudioModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioModel.swift; sourceTree = "<group>"; };
 		AB5F8E5F26FEA02A00BC67BD /* Lab2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lab2-Bridging-Header.h"; sourceTree = "<group>"; };
+		AB5F8E6226FFF8D400BC67BD /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 		5527958D26FD97CC007587EB = {
 			isa = PBXGroup;
 			children = (
+				AB5F8E6226FFF8D400BC67BD /* Shaders.metal */,
 				5527959826FD97CC007587EB /* Lab2 */,
 				5527959726FD97CC007587EB /* Products */,
 			);
@@ -173,6 +176,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB5F8E6326FFF8D400BC67BD /* Shaders.metal in Sources */,
 				AB5F8E5D26FE9F3500BC67BD /* AudioModel.swift in Sources */,
 				552795AE26FD99BC007587EB /* ModuleAViewController.swift in Sources */,
 				AB5F8E5626FE9E9300BC67BD /* AudioFileReader.m in Sources */,

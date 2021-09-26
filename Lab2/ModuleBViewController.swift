@@ -32,23 +32,23 @@ class ModuleBViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        graph?.addGraph(withName: "fft",
-//                        shouldNormalize: true,
-//                        numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        graph?.addGraph(withName: "fft",
+                        shouldNormalize: true,
+                        numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
+
+        graph?.addGraph(withName: "time",
+            shouldNormalize: false,
+            numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE)
+
+        Timer.scheduledTimer(timeInterval: 0.05, target: self,
+            selector: #selector(self.updateGraph),
+            userInfo: nil,
+            repeats: true)
+
+    }
 //
-//        graph?.addGraph(withName: "time",
-//            shouldNormalize: false,
-//            numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE)
-//
-//        Timer.scheduledTimer(timeInterval: 0.05, target: self,
-//            selector: #selector(self.updateGraph),
-//            userInfo: nil,
-//            repeats: true)
-//
-//    }
-//    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         audio.pause()
