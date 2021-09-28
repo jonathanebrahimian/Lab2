@@ -31,16 +31,20 @@ class AudioModel {
 
     func startProcessingSinewaveForPlayback(withFreq: Float = 330.0) {
         sineFrequency = withFreq
-
-        // Two examples are given that use either objective c or that use swift
-        //   the swift code for loop is slightly slower thatn doing this in c,
-        //   but the implementations are very similar
-        //self.audioManager?.outputBlock = self.handleSpeakerQueryWithSinusoid // swift for loop
         self.audioManager?.setOutputBlockToPlaySineWave(sineFrequency) // c for loop
     }
 
-    func play() {
+    func play(forModule: String) {
         if let manager = self.audioManager {
+            if forModule.lowercased() == "a"
+            {
+                // do things for module a
+
+            } else if forModule.lowercased() == "b"
+            {
+                manager.setOutputBlockToPlaySineWave(sineFrequency)
+            }
+
             manager.play()
         }
     }
@@ -72,7 +76,6 @@ class AudioModel {
         }
     }
 
-
     private lazy var fftHelper: FFTHelper? = {
         return FFTHelper.init(fftSize: Int32(BUFFER_SIZE))
     }()
@@ -97,6 +100,18 @@ class AudioModel {
             //   timeData: the raw audio samples
             //   fftData:  the FFT of those same samples
             // the user can now use these variables however they like
+
+            print("fft: ", fftData)
+
+            var fftMaxes = [Float](repeating: .nan,
+                                   count: fftData.count)
+
+            let windowLength = vDSP_Length(5)
+            let outputCount = vDSP_Length(fftData.count) - windowLength + 1
+
+            vDSP_vswmax(fftData, vDSP_Stride(1), &fftMaxes, vDSP_Stride(1), outputCount, windowLength)
+
+            print("max: ", fftMaxes)
 
             // here we find the single peak for mod B
             let stride = vDSP_Stride(1)

@@ -26,14 +26,13 @@ class ModuleBViewController: UIViewController {
         // start up the audio model here, querying microphone
         audio.startMicrophoneProcessing(withFps: 10)
         audio.startProcessingSinewaveForPlayback(withFreq: 1000)
-        audio.play()
-        
-    
-        // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        audio.play(forModule: "b")
+        
         graph?.addGraph(withName: "fft",
                         shouldNormalize: true,
                         numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
@@ -56,7 +55,6 @@ class ModuleBViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         audio.pause()
-        
     }
     
     @IBOutlet weak var freqLabel: UILabel!
