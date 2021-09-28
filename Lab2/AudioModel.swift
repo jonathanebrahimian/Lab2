@@ -16,6 +16,13 @@ class AudioModel {
     var timeData: [Float]
     var fftData: [Float]
 
+    var firstPeak: Float = -1
+    {
+        didSet {
+            print(firstPeak)
+        }
+    }
+    
     // data focused on peak for module b
     var peakData: [Float]
 
@@ -36,13 +43,15 @@ class AudioModel {
 
     func play(forModule: String) {
         if let manager = self.audioManager {
+            startMicrophoneProcessing(withFps: 10)
+
             if forModule.lowercased() == "a"
             {
                 // do things for module a
 
             } else if forModule.lowercased() == "b"
             {
-                manager.setOutputBlockToPlaySineWave(sineFrequency)
+                startProcessingSinewaveForPlayback(withFreq: 1000)
             }
 
             manager.play()
@@ -53,6 +62,7 @@ class AudioModel {
         if let manager = self.audioManager {
             manager.pause()
             manager.outputBlock = nil
+            manager.inputBlock = nil
         }
     }
 
@@ -101,17 +111,30 @@ class AudioModel {
             //   fftData:  the FFT of those same samples
             // the user can now use these variables however they like
 
-            print("fft: ", fftData)
+            var peaks: [Float] = []
+            var peakIndexes: [Int] = []
 
-            var fftMaxes = [Float](repeating: .nan,
-                                   count: fftData.count)
+            for i in 0...fftData.count - 6
+            {
+                if fftData[i + 3] > -1 && fftData[i...(i + 5)].max() == fftData[i + 3]
+                {
+                    peaks.append(fftData[i + 3])
+                    peakIndexes.append(i + 3)
+                }
+            }
 
-            let windowLength = vDSP_Length(5)
-            let outputCount = vDSP_Length(fftData.count) - windowLength + 1
+            if peakIndexes.count > 0, let audioManager = audioManager {
+                let peakIndex: Int = peakIndexes.max() ?? 0
+                let peakHz: Double = Double(peakIndex) * (audioManager.samplingRate / Double(fftData.count))
 
-            vDSP_vswmax(fftData, vDSP_Stride(1), &fftMaxes, vDSP_Stride(1), outputCount, windowLength)
+                let change: Float = Float(audioManager.samplingRate / Double(fftData.count)) / 2
+                let top: Float = fftData[peakIndex - 1] - fftData[peakIndex + 1]
+                let bottom: Float = fftData[peakIndex - 1] - (2 * fftData[peakIndex]) + fftData[peakIndex + 1]
 
-            print("max: ", fftMaxes)
+                firstPeak = Float(peakHz) + (top / bottom) * change
+            } else {
+                firstPeak = -1
+            }
 
             // here we find the single peak for mod B
             let stride = vDSP_Stride(1)

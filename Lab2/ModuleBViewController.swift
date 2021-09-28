@@ -21,11 +21,6 @@ class ModuleBViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        
-        // start up the audio model here, querying microphone
-        audio.startMicrophoneProcessing(withFps: 10)
-        audio.startProcessingSinewaveForPlayback(withFreq: 1000)
     }
     
     override func viewWillAppear(_ animated: Bool) {
