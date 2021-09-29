@@ -16,13 +16,13 @@ class AudioModel {
     var timeData: [Float]
     var fftData: [Float]
 
+    // first & second largest peaks
     var firstPeak: Float = -1
-    {
-        didSet {
-            print(firstPeak)
-        }
-    }
-    
+    var secondPeak: Float = -1
+
+    // gets set when setting mic up
+    var deltaFreq: Float = 0
+
     // data focused on peak for module b
     var peakData: [Float]
 
@@ -77,6 +77,7 @@ class AudioModel {
         // setup the microphone to copy to circular buffer
         if let manager = self.audioManager {
             manager.inputBlock = self.handleMicrophone
+            deltaFreq = Float(manager.samplingRate) / Float(BUFFER_SIZE)
 
             // repeat this fps times per second using the timer class every time this is called, we update the arrays "timeData" and "fftData"
             Timer.scheduledTimer(timeInterval: 1.0 / withFps, target: self,
@@ -111,30 +112,84 @@ class AudioModel {
             //   fftData:  the FFT of those same samples
             // the user can now use these variables however they like
 
-            var peaks: [Float] = []
-            var peakIndexes: [Int] = []
+            var peaks: [Float] = [] // magnitudes of peak in fft
+            var peakIndexes: [Int] = [] // indexes of peak in fft
 
-            for i in 0...fftData.count - 6
+            // find peaks using sliding window of size 5
+            for i in 1...fftData.count - 6
             {
-                if fftData[i + 3] > -1 && fftData[i...(i + 5)].max() == fftData[i + 3]
+                // if peak is in center & > -1
+                if fftData[i + 3] > 3 && fftData[i...(i + 5)].max() == fftData[i + 3]
                 {
                     peaks.append(fftData[i + 3])
                     peakIndexes.append(i + 3)
                 }
             }
 
-            if peakIndexes.count > 0, let audioManager = audioManager {
-                let peakIndex: Int = peakIndexes.max() ?? 0
-                let peakHz: Double = Double(peakIndex) * (audioManager.samplingRate / Double(fftData.count))
+            // calculates frequency with interpolation
+            func getFrequency(peakIndex: Int) -> Float
+            {
+                let peakFreq = deltaFreq * Float(peakIndex)
+                let quadApprox = (fftData[peakIndex - 1] - fftData[peakIndex + 1]) / (fftData[peakIndex + 1] - 2 * fftData[peakIndex] + fftData[peakIndex - 1])
 
-                let change: Float = Float(audioManager.samplingRate / Double(fftData.count)) / 2
-                let top: Float = fftData[peakIndex - 1] - fftData[peakIndex + 1]
-                let bottom: Float = fftData[peakIndex - 1] - (2 * fftData[peakIndex]) + fftData[peakIndex + 1]
-
-                firstPeak = Float(peakHz) + (top / bottom) * change
-            } else {
-                firstPeak = -1
+                return Float(peakFreq + quadApprox * deltaFreq * 0.5)
             }
+
+            // if only 1 peak meets requirement
+            if peakIndexes.count == 1 {
+                firstPeak = getFrequency(peakIndex: peakIndexes[0])
+                secondPeak = -1
+            }
+            else if peakIndexes.count > 1 {
+                var largestA: Float = -MAXFLOAT
+                var largestAIndex: Int = -1
+                var largestB: Float = -MAXFLOAT
+                var largestBIndex: Int = -1
+
+                // largestA is 1st largest, largestB is 2nd largest
+                for i in 0...peaks.count - 1 {
+                    if peaks[i] > largestA {
+                        largestB = largestA
+                        largestBIndex = largestAIndex
+
+                        largestA = peaks[i]
+                        largestAIndex = i
+                    } else if peaks[i] > largestB {
+                        largestB = peaks[i]
+                        largestBIndex = i
+                    }
+                }
+
+                // set peaks
+                firstPeak = getFrequency(peakIndex: peakIndexes[largestAIndex])
+                secondPeak = getFrequency(peakIndex: peakIndexes[largestBIndex])
+            }
+            // if no peaks
+                else {
+                firstPeak = -1
+                secondPeak = -1
+            }
+
+            print(firstPeak, secondPeak)
+
+
+//            if peakIndexes.count > 2, let audioManager = audioManager {
+//
+//
+//                var peakMag: Float = .nan
+//                var peakIndex: vDSP_Length = 0
+//
+//                vDSP_maxvi(peaks, vDSP_Stride(1), &peakMag, &peakIndex, vDSP_Length(peaks.count))
+//
+//                let k = peakIndexes[Int(peakIndex)]
+//                let deltaFreq = Float(audioManager.samplingRate) / Float(BUFFER_SIZE)
+//                let peakFreq = deltaFreq * Float(k)
+//                let quadApprox = (fftData[k - 1] - fftData[k + 1]) / (fftData[k + 1] - 2 * fftData[k] + fftData[k - 1])
+//
+//                firstPeak = Float(peakFreq + quadApprox * deltaFreq * 0.5)
+//            } else {
+//                firstPeak = -1
+//            }
 
             // here we find the single peak for mod B
             let stride = vDSP_Stride(1)
