@@ -17,9 +17,12 @@
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
 					<key>UISceneStoryboardFile</key>
 					<string>Main</string>
+                    
 				</dict>
 			</array>
 		</dict>
 	</dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Need microphone access for uploading videos</string>
 </dict>
 </plist>

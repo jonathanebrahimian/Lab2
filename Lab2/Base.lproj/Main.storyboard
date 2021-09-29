@@ -127,23 +127,20 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1000" minValue="15" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="Srk-WC-YcI">
-                                <rect key="frame" x="58" y="643" width="298" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1000" minValue="15" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="Srk-WC-YcI">
+                                <rect key="frame" x="57" y="582.5" width="298" height="31"/>
                                 <connections>
                                     <action selector="changeFrequency:" destination="Zi3-ag-Yij" eventType="valueChanged" id="b3t-De-eiA"/>
                                 </connections>
                             </slider>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Frequency: 1000" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ulb-7p-vTL">
-                                <rect key="frame" x="82" y="506" width="249" height="49"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Frequency: 1000" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ulb-7p-vTL">
+                                <rect key="frame" x="82" y="462" width="249" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Neutral" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CfK-r6-BGk">
-                                <rect key="frame" x="107" y="724" width="198" height="33"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Neutral" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CfK-r6-BGk">
+                                <rect key="frame" x="108" y="694" width="198" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -151,6 +148,17 @@
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="3fy-vT-s8Y"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="3fy-vT-s8Y" firstAttribute="trailing" secondItem="Ulb-7p-vTL" secondAttribute="trailing" constant="83" id="15C-rj-JSq"/>
+                            <constraint firstItem="Srk-WC-YcI" firstAttribute="leading" secondItem="3fy-vT-s8Y" secondAttribute="leading" constant="59" id="FJP-5b-7Tz"/>
+                            <constraint firstItem="Ulb-7p-vTL" firstAttribute="leading" secondItem="3fy-vT-s8Y" secondAttribute="leading" constant="82" id="G2h-HL-ub9"/>
+                            <constraint firstItem="3fy-vT-s8Y" firstAttribute="trailing" secondItem="CfK-r6-BGk" secondAttribute="trailing" constant="108" id="OOY-80-9wM"/>
+                            <constraint firstItem="Srk-WC-YcI" firstAttribute="centerX" secondItem="Ulb-7p-vTL" secondAttribute="centerX" id="W51-V8-8ZI"/>
+                            <constraint firstItem="CfK-r6-BGk" firstAttribute="leading" secondItem="3fy-vT-s8Y" secondAttribute="leading" constant="108" id="bcs-BM-iKS"/>
+                            <constraint firstItem="CfK-r6-BGk" firstAttribute="top" secondItem="Srk-WC-YcI" secondAttribute="bottom" constant="81.5" id="e81-Q4-XwS"/>
+                            <constraint firstItem="3fy-vT-s8Y" firstAttribute="bottom" secondItem="CfK-r6-BGk" secondAttribute="bottom" constant="147.5" id="gpy-Ja-PP4"/>
+                            <constraint firstItem="Ulb-7p-vTL" firstAttribute="top" secondItem="3fy-vT-s8Y" secondAttribute="top" constant="374" id="jSS-7h-5qN"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="XXk-tH-g7d"/>
                     <connections>
