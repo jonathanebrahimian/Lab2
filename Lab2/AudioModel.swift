@@ -15,8 +15,8 @@ class AudioModel {
     private var BUFFER_SIZE:Int
     var timeData:[Float]
     var fftData:[Float]
-    var peakData:[Float]
-    //this graph concentrate on the peak in mod B
+    var baseline:[Float]
+    var begin:Bool
     
     
     // MARK: Public Methods
@@ -25,8 +25,8 @@ class AudioModel {
         // anything not lazily instatntiated should be allocated here
         timeData = Array.init(repeating: 0.0, count: BUFFER_SIZE)
         fftData = Array.init(repeating: 0.0, count: BUFFER_SIZE/2)
-        
-        peakData = Array.init(repeating: 0.0, count: BUFFER_SIZE/10)
+        baseline = Array.init(repeating: 0.0, count: BUFFER_SIZE/2)
+        begin = true
     }
     
     func startProcessingSinewaveForPlayback(withFreq:Float=330.0){
@@ -42,6 +42,7 @@ class AudioModel {
     func play(){
         if let manager = self.audioManager{
             manager.play()
+            
         }
     }
     
@@ -78,9 +79,106 @@ class AudioModel {
                                    andBufferSize: Int64(BUFFER_SIZE))
     }()
     
+    func setBaseline(){
+        baseline = fftData
+    }
+    
+    func detectMovement()-> String{
+        var max:Float = -9999.99
+        var maxIndex:Int = 0
+        for (index, element) in fftData.enumerated(){
+            if(element > max){
+                max = element;
+                maxIndex = index;
+            }
+            //we get the index and value of max in fft
+        }
+        
+        var leftcounter = maxIndex - 1
+        var rightcounter = maxIndex + 1
+        var averageLeftFFT:Float = 0
+        var averageRightFFT:Float = 0
+        var loopcounter = 1
+        
+        //the code below calculates the average of upto 5 elements next to the max in fft data to compare it with baseline data
+        
+        while(leftcounter >= 0){
+            averageLeftFFT = averageLeftFFT + fftData[leftcounter]
+            loopcounter += 1
+            leftcounter -= 1
+            if(loopcounter > 5){
+                break
+            }
+        }
+        
+        averageLeftFFT = averageLeftFFT / Float(loopcounter)
+        
+        loopcounter = 1
+        
+        while(rightcounter < fftData.count){
+            averageRightFFT = averageRightFFT + fftData[rightcounter]
+            loopcounter += 1
+            rightcounter += 1
+            if(loopcounter > 5){
+                break
+            }
+        }
+        
+        averageRightFFT = averageRightFFT / Float(loopcounter)
+        
+        //now we calculate the left and right average in baseline
+        leftcounter = maxIndex - 1
+        rightcounter = maxIndex + 1
+        var averageLeftBaseline:Float = 0
+        var averageRightBaseline:Float = 0
+        loopcounter = 1
+        
+        while(leftcounter >= 0){
+            averageLeftBaseline += baseline[leftcounter]
+            loopcounter += 1
+            leftcounter -= 1
+            if(loopcounter > 5){
+                break
+            }
+        }
+        
+        averageLeftBaseline = averageLeftBaseline / Float(loopcounter)
+        
+        loopcounter = 1
+        while(rightcounter < baseline.count){
+            averageRightBaseline = averageRightBaseline + baseline[rightcounter]
+            loopcounter += 1
+            rightcounter += 1
+            if(loopcounter > 5){
+                break
+            }
+        }
+        
+        averageRightBaseline = averageRightBaseline / Float(loopcounter)
+        
+        // here we calculate the percent change in both left and right
+        var percentLeftChange: Float = (averageLeftFFT - averageLeftBaseline) / averageLeftBaseline
+        
+        var percentRightChange: Float = (averageRightFFT - averageRightBaseline) / averageRightBaseline
+        
+        if(percentLeftChange > percentRightChange){
+            return "Gesture Away"
+        }
+        else if (percentLeftChange < percentRightChange){
+            return "Gesture Toward"
+        }
+        
+        return "Neutral"
+        
+        
+        
+        
+    }
+    
     @objc
     private func runEveryInterval(){
         if inputBuffer != nil {
+            
             // copy time data to swift array
             self.inputBuffer!.fetchFreshData(&timeData,
                                              withNumSamples: Int64(BUFFER_SIZE))
@@ -88,70 +186,14 @@ class AudioModel {
             // now take FFT
             fftHelper!.performForwardFFT(withData: &timeData,
                                          andCopydBMagnitudeToBuffer: &fftData)
-            
+            if(begin){
+                baseline = fftData
+                begin = false
+            }
             // at this point, we have saved the data to the arrays:
             //   timeData: the raw audio samples
             //   fftData:  the FFT of those same samples
             // the user can now use these variables however they like
-            //here we find the single peak for mod B
-            let stride = vDSP_Stride(1)
-            let n = vDSP_Length(fftData.count)
-            var c: Float = .nan
-            var i: vDSP_Length = 0
-            vDSP_maxvi(fftData,
-                       stride,
-                       &c,
-                       &i,
-                       n)
-
-//            print("max", c, "index", i)
-//            c is the max element and i is the index
-            //here we find the starting point of peak data
-            //within fft data
-            //our goal is to find the peak and equal amount of data to the left and right
-//            var startarr = Int(i) - peakData.count/2
-//            var endarr = Int(i) + peakData.count*2
-//            var startdiff = 0
-//            var enddiff = 0
-//            if(startarr < 0){
-//                startdiff = abs(startarr)
-//                startarr = 0
-//            }
-//            if(endarr > peakData.count){
-//                enddiff = abs(enddiff)
-//                endarr = peakData.count
-//            }
-//            peakData = Array(fftData[startarr...endarr])
-            var leftcounter = Int(i)
-            var rightcounter = Int(i)
-            let peakMid = peakData.count/2
-            peakData[peakMid] = c
-            var peakleftcounter = peakMid - 1
-            var peakrightcounter = peakMid + 1
-            
-            while(leftcounter>=0 && peakleftcounter >= 0){
-                peakData[peakleftcounter] = fftData[leftcounter]
-                leftcounter = leftcounter - 1
-                peakleftcounter = peakleftcounter - 1
-            }
-            while(peakleftcounter >= 0 && leftcounter == 0){
-                peakData[peakleftcounter] = fftData[0]
-                peakleftcounter = peakleftcounter - 1
-            }
-            
-            while(rightcounter < fftData.count && peakrightcounter < peakData.count){
-                peakData[peakrightcounter] = fftData[rightcounter]
-                peakrightcounter = peakrightcounter + 1
-                rightcounter = rightcounter + 1
-            }
-            
-            while(rightcounter >= fftData.count && peakrightcounter < peakData.count){
-                peakData[peakrightcounter] = fftData[fftData.count - 1]
-                peakrightcounter = peakrightcounter + 1
-            }
-            
-            
-    
             
         }
     }
