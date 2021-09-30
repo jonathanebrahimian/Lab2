@@ -87,8 +87,19 @@ class AudioModel {
     
     func detectMovement()-> String{
         //here is where we start detecting movment
+        //let me explain how this work
+        //first we calculate the max index by the equation
+        //current freq * n(buffer size) / Fs(sampling rate)
+        //take the int floor of this
+        //then we take the average left and right of upto 5 elements next to the max
+        //in both baseline and fftdata
+        //then we find the percent left change and right change by
+        //average left/right change fft - average left/right change baseline
+        //we compare these changes to a threshold,
+        //according to larson in class left threshold will be slightly lower than
+        //right threshold due to noises and decreasing frequency 
         
-        var maxIndex:Int = Int(sineFrequency) * BUFFER_SIZE / 2 / 44100;
+        var maxIndex:Int = Int(sineFrequency) * BUFFER_SIZE / 2 / Int(Novocaine.audioManager().samplingRate);
         //calculate max index by k = Freq * n / Fs
         print("MAX INDEX")
         print(maxIndex)
@@ -165,22 +176,25 @@ class AudioModel {
         var percentRightChange: Float = averageRightFFT - averageRightBaseline
         
 
+     
+        if(percentLeftChange < 0){
+            percentLeftChange = percentLeftChange * -1
+        }
+        if(percentRightChange < 0){
+            percentRightChange = percentRightChange * -1
+        }
+        
         print("percentage increase in baseline left")
         print(percentLeftChange)
         print("percentage increase in baseline right")
         print(percentRightChange)
-//        if(percentLeftChange < 0){
-//            percentLeftChange = percentLeftChange * -1
-//        }
-//        if(percentRightChange < 0){
-//            percentRightChange = percentRightChange * -1
-//        }
         
         //here we define a threshold to see whether they are gestuing toward or away 
-        if(percentLeftChange > 7 && percentRightChange < 6){
+        //left threshold will be slightly lower because of noises
+        if(percentLeftChange > 8 && percentRightChange < 6){
             return "Away"
         }
-        else if (percentRightChange > 7 && percentLeftChange < 6){
+        else if (percentRightChange > 9 && percentLeftChange < 6){
             return "Toward"
         }
         
