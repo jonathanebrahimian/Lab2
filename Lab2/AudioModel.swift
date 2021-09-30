@@ -14,8 +14,11 @@ class AudioModel {
     // MARK: Properties
     private var BUFFER_SIZE:Int
     var timeData:[Float]
+    //time data
     var fftData:[Float]
+    //fft data at the current moment
     var baseline:[Float]
+    //fft data in the previous time interval
     
     
     // MARK: Public Methods
@@ -83,18 +86,21 @@ class AudioModel {
     }
     
     func detectMovement()-> String{
-        
+        //here is where we start detecting movment
         
         var maxIndex:Int = Int(sineFrequency) * BUFFER_SIZE / 2 / 44100;
+        //calculate max index by k = Freq * n / Fs
         print("MAX INDEX")
         print(maxIndex)
+        
+        //these are the variables for counting the average freq at the left and right of the max index
         var leftcounter = maxIndex - 1
         var rightcounter = maxIndex + 1
         var averageLeftFFT:Float = 0
         var averageRightFFT:Float = 0
         var loopcounter = 1
         
-        //the code below calculates the average of upto 5 elements next to the max in fft data to compare it with baseline data
+        //the code below calculates the average of upto 5 elements left/right to the max in fft data to compare it with baseline data
         
         while(leftcounter >= 0){
             averageLeftFFT = averageLeftFFT + fftData[leftcounter]
@@ -106,9 +112,11 @@ class AudioModel {
         }
         
         averageLeftFFT = averageLeftFFT / Float(loopcounter)
+        //take the average
         
         loopcounter = 1
         
+        //calculate the average in the right  5 element of fft max
         while(rightcounter < fftData.count){
             averageRightFFT = averageRightFFT + fftData[rightcounter]
             loopcounter += 1
@@ -121,6 +129,7 @@ class AudioModel {
         averageRightFFT = averageRightFFT / Float(loopcounter)
         
         //now we calculate the left and right average in baseline
+        //same logic with fft except different data
         leftcounter = maxIndex - 1
         rightcounter = maxIndex + 1
         var averageLeftBaseline:Float = 0
@@ -167,11 +176,12 @@ class AudioModel {
 //            percentRightChange = percentRightChange * -1
 //        }
         
-        if(percentLeftChange > 6 && percentRightChange < 6){
-            return "Gesture Away"
+        //here we define a threshold to see whether they are gestuing toward or away 
+        if(percentLeftChange > 7 && percentRightChange < 6){
+            return "Away"
         }
-        else if (percentRightChange > 6 && percentLeftChange < 6){
-            return "Gesture Toward"
+        else if (percentRightChange > 7 && percentLeftChange < 6){
+            return "Toward"
         }
         
         return "Neutral"

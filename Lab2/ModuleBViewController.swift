@@ -29,7 +29,7 @@ class ModuleBViewController: UIViewController {
         
         // Do any additional setup after loading the view.
     }
-    
+    var timer = Timer()
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         graph?.addGraph(withName: "fft",
@@ -50,10 +50,16 @@ class ModuleBViewController: UIViewController {
             selector: #selector(self.updateGraph),
             userInfo: nil,
             repeats: true)
+        //the above function update graphs
+        //the below function detect gesture movements
+        self.timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true, block: { _ in
+            self.detectMovements()
+        })
        
     }
 //
     override func viewWillDisappear(_ animated: Bool) {
+        //pause the audio upon dismissing the view
         super.viewWillDisappear(animated)
         audio.pause()
         
@@ -66,12 +72,13 @@ class ModuleBViewController: UIViewController {
     
     
     @IBAction func changeFrequency(_ sender: UISlider) {
+        //change frequency
         self.audio.sineFrequency = sender.value
         freqLabel.text = "Frequency: \(sender.value)"
-        audio.setBaseline()
     }
     
     func updateGestureLabel(status: String){
+        //update label for gesturing
         DispatchQueue.main.async { [weak self] in
             self!.gestureType.text = status
         }
@@ -94,10 +101,14 @@ class ModuleBViewController: UIViewController {
             data: self.audio.timeData,
             forKey: "time"
         )
-            //this is the method that we set baseline
-        
+   
+    }
+    
+    
+    func detectMovements(){
         //update gesture type according to the frequency
         var gesturetype = audio.detectMovement()
+        //update label on main queue
         updateGestureLabel(status: gesturetype)
     }
     
