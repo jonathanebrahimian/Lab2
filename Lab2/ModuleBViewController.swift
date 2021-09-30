@@ -14,6 +14,7 @@ class ModuleBViewController: UIViewController {
     }
     
     // setup audio model
+
     let audio = AudioModel(buffer_size: AudioConstants.AUDIO_BUFFER_SIZE)
     lazy var graph:MetalGraph? = {
         return MetalGraph(mainView: self.view)
@@ -49,9 +50,7 @@ class ModuleBViewController: UIViewController {
             selector: #selector(self.updateGraph),
             userInfo: nil,
             repeats: true)
-        audio.setBaseline()
-        //this is the method that we set baseline
-
+       
     }
 //
     override func viewWillDisappear(_ animated: Bool) {
@@ -78,9 +77,14 @@ class ModuleBViewController: UIViewController {
         }
     }
     
+
     
     @objc
     func updateGraph(){
+        self.graph?.updateGraph(
+            data: self.audio.baseline,
+            forKey: "baseline"
+        )
         self.graph?.updateGraph(
             data: self.audio.fftData,
             forKey: "fft"
@@ -90,11 +94,7 @@ class ModuleBViewController: UIViewController {
             data: self.audio.timeData,
             forKey: "time"
         )
-        
-        self.graph?.updateGraph(
-            data: self.audio.baseline,
-            forKey: "baseline"
-        )
+            //this is the method that we set baseline
         
         //update gesture type according to the frequency
         var gesturetype = audio.detectMovement()

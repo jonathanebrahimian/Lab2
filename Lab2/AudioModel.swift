@@ -16,7 +16,6 @@ class AudioModel {
     var timeData:[Float]
     var fftData:[Float]
     var baseline:[Float]
-    var begin:Bool
     
     
     // MARK: Public Methods
@@ -26,7 +25,6 @@ class AudioModel {
         timeData = Array.init(repeating: 0.0, count: BUFFER_SIZE)
         fftData = Array.init(repeating: 0.0, count: BUFFER_SIZE/2)
         baseline = Array.init(repeating: 0.0, count: BUFFER_SIZE/2)
-        begin = true
     }
     
     func startProcessingSinewaveForPlayback(withFreq:Float=330.0){
@@ -66,6 +64,7 @@ class AudioModel {
                                  selector: #selector(self.runEveryInterval),
                                  userInfo: nil,
                                  repeats: true)
+         
         }
     }
     
@@ -84,16 +83,11 @@ class AudioModel {
     }
     
     func detectMovement()-> String{
-        var max:Float = -9999.99
-        var maxIndex:Int = 0
-        for (index, element) in fftData.enumerated(){
-            if(element > max){
-                max = element;
-                maxIndex = index;
-            }
-            //we get the index and value of max in fft
-        }
         
+        
+        var maxIndex:Int = Int(sineFrequency) * BUFFER_SIZE / 2 / 44100;
+        print("MAX INDEX")
+        print(maxIndex)
         var leftcounter = maxIndex - 1
         var rightcounter = maxIndex + 1
         var averageLeftFFT:Float = 0
@@ -157,14 +151,26 @@ class AudioModel {
         averageRightBaseline = averageRightBaseline / Float(loopcounter)
         
         // here we calculate the percent change in both left and right
-        var percentLeftChange: Float = (averageLeftFFT - averageLeftBaseline) / averageLeftBaseline
+        var percentLeftChange: Float = averageLeftFFT - averageLeftBaseline
         
-        var percentRightChange: Float = (averageRightFFT - averageRightBaseline) / averageRightBaseline
+        var percentRightChange: Float = averageRightFFT - averageRightBaseline
         
-        if(percentLeftChange > percentRightChange){
+
+        print("percentage increase in baseline left")
+        print(percentLeftChange)
+        print("percentage increase in baseline right")
+        print(percentRightChange)
+//        if(percentLeftChange < 0){
+//            percentLeftChange = percentLeftChange * -1
+//        }
+//        if(percentRightChange < 0){
+//            percentRightChange = percentRightChange * -1
+//        }
+        
+        if(percentLeftChange > 6 && percentRightChange < 6){
             return "Gesture Away"
         }
-        else if (percentLeftChange < percentRightChange){
+        else if (percentRightChange > 6 && percentLeftChange < 6){
             return "Gesture Toward"
         }
         
@@ -178,7 +184,7 @@ class AudioModel {
     @objc
     private func runEveryInterval(){
         if inputBuffer != nil {
-            
+            baseline = fftData
             // copy time data to swift array
             self.inputBuffer!.fetchFreshData(&timeData,
                                              withNumSamples: Int64(BUFFER_SIZE))
@@ -186,13 +192,11 @@ class AudioModel {
             // now take FFT
             fftHelper!.performForwardFFT(withData: &timeData,
                                          andCopydBMagnitudeToBuffer: &fftData)
-            if(begin){
-                baseline = fftData
-                begin = false
-            }
+         
             // at this point, we have saved the data to the arrays:
             //   timeData: the raw audio samples
             //   fftData:  the FFT of those same samples
+            //   baseline: the fft in previous interval
             // the user can now use these variables however they like
             
         }
