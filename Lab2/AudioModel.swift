@@ -176,13 +176,7 @@ class AudioModel {
         var percentRightChange: Float = averageRightFFT - averageRightBaseline
         
 
-     
-        if(percentLeftChange < 0){
-            percentLeftChange = percentLeftChange * -1
-        }
-        if(percentRightChange < 0){
-            percentRightChange = percentRightChange * -1
-        }
+
         
         print("percentage increase in baseline left")
         print(percentLeftChange)
@@ -191,10 +185,10 @@ class AudioModel {
         
         //here we define a threshold to see whether they are gestuing toward or away 
         //left threshold will be slightly lower because of noises
-        if(percentLeftChange > 8 && percentRightChange < 6){
+        if(percentLeftChange > 6 && percentRightChange < 6){
             return "Away"
         }
-        else if (percentRightChange > 9 && percentLeftChange < 6){
+        else if (percentRightChange > 6 && percentLeftChange < 6){
             return "Toward"
         }
         
