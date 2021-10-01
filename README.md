@@ -2,4 +2,4 @@
 
 ### Group members: Jonathan Ebrahimian, Nathan Gage, Edward Jiang 
 
-### Youtube link: 
+### Youtube link: https://youtu.be/_GYvUdLMfz8
