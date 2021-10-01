@@ -24,10 +24,12 @@ class ModuleBViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // start up the audio model here, querying microphone
+        
         audio.startMicrophoneProcessing(withFps: 10)
+        //start at freq 20k
         audio.startProcessingSinewaveForPlayback(withFreq: 20000)
         audio.play()
-        frequencySlider.value = 20000
+        frequencySlider.value = 20000 //start at freq 20k
         
         
         
@@ -49,10 +51,6 @@ class ModuleBViewController: UIViewController {
             selector: #selector(self.updateGraph),
             userInfo: nil,
             repeats: true)
-        //the above function update graphs
-        //the below function detect gesture movements
-
-       
        
     }
 //
@@ -74,19 +72,11 @@ class ModuleBViewController: UIViewController {
     
     
     @IBAction func changeFrequency(_ sender: UISlider) {
-        //change frequency
+        //change frequency when slider is updated
         self.audio.changeFrequency(frequencyIn: sender.value)
         freqLabel.text = "Frequency: \(sender.value)"
     }
     
-    func updateGestureLabel(status: String){
-        //update label for gesturing
-        DispatchQueue.main.async { [weak self] in
-            self!.gestureType.text = status
-        }
-    }
-    
-
     
     @objc
     func updateGraph(){
@@ -100,6 +90,7 @@ class ModuleBViewController: UIViewController {
             forKey: "time"
         )
         
+        //every time we update the graph, update the gesture label
         DispatchQueue.main.async {
             self.gestureType.text = self.audio.gesture
         }

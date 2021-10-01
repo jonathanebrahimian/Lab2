@@ -128,7 +128,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="20000" minValue="15" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="Srk-WC-YcI">
+                            <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="20000" minValue="15000" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="Srk-WC-YcI">
                                 <rect key="frame" x="57" y="582.5" width="298" height="31"/>
                                 <connections>
                                     <action selector="changeFrequency:" destination="Zi3-ag-Yij" eventType="valueChanged" id="b3t-De-eiA"/>

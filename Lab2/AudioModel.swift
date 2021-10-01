@@ -13,29 +13,47 @@ class AudioModel {
     
     // MARK: Properties
     private var BUFFER_SIZE:Int
-    var timeData:[Float]
+    
     //time data
-    var fftData:[Float]
+    var timeData:[Float]
+   
     //fft data at the current moment
+    var fftData:[Float]
+    
+    
+    //Baseline calculations
     var rightMaxAvgBaseline:[Float]
     var leftMaxAvgBaseline:[Float]
-    var rightMaxAvg:[Float]
-    var leftMaxAvg:[Float]
+    var peakAvg:[Float]
     var leftBaseline:Float;
     var rightBaseline:Float;
-    var caputringBaselines:Bool;
-    var maxIndex:Int;
-    let windowSize = 5;
-    var insertMaxIndex:Int;
-    let numDetectionFrames = 5;
-    let numBaselineFrames = 5;
-    let percentIncrease:Float = 0.2;
-    var startDetection:Bool;
-    var statsLeft:[Float] = [];
-    var statsRight:[Float] = [];
+    let numBaselineFrames = 5;//num frames used to set baselines
+    
+    //thresholds for gesture detection
     var rightPercentage:Float;
     var leftPercentage:Float;
-    var gesture:String;
+    
+    //array (implemented as ring buffer) to store the past num number of maxes
+    var rightMaxAvg:[Float]
+    var leftMaxAvg:[Float]
+    var insertMaxIndex:Int; //helps with ring buffer implementation
+    let numDetectionFrames = 5;
+    let windowSize = 6; //how many elements are we looking to the left and right
+    
+    //status variables
+    var caputringBaselines:Bool;
+    var startDetection:Bool;
+    
+    var maxIndex:Int;//index of max value in fft data
+    
+    var gesture:String;//gesture recognized
+    
+    //arrays to help debuging
+    var statsLeft:[Float] = [];
+    var statsRight:[Float] = [];
+    
+    
+    
     
     
     
@@ -49,13 +67,16 @@ class AudioModel {
         // anything not lazily instatntiated should be allocated here
         timeData = Array.init(repeating: 0.0, count: BUFFER_SIZE)
         fftData = Array.init(repeating: 0.0, count: BUFFER_SIZE/2)
+        
+        //set all vars to step 0 values
         rightMaxAvgBaseline = Array()
         leftMaxAvgBaseline = Array()
+        peakAvg = Array()
         rightMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
         leftMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
         rightBaseline = 0
         leftBaseline = 0
-        caputringBaselines = true
+        caputringBaselines = true //start capturing baselines
         startDetection = false
         maxIndex = 0
         insertMaxIndex = 0
@@ -69,6 +90,7 @@ class AudioModel {
     func startProcessingSinewaveForPlayback(withFreq:Float=330.0){
         sineFrequency = withFreq
         
+        //get index of the peak in the fft (from equation)
         maxIndex = Int((Float(sineFrequency) * Float(BUFFER_SIZE ) / Float(Novocaine.audioManager().samplingRate)).rounded());
         // Two examples are given that use either objective c or that use swift
         //   the swift code for loop is slightly slower thatn doing this in c,
@@ -119,13 +141,19 @@ class AudioModel {
                                    andBufferSize: Int64(BUFFER_SIZE))
     }()
     
+    
+    /* Get the average of the inputted float array.
+     * This code was adapted from the stack overflow link below:
+     * https://stackoverflow.com/questions/43703823/how-to-find-the-average-value-of-an-array-swift
+     */
     func getAvg(arr: [Float]) -> Float{
         let sumArray = arr.reduce(0, +);
         return sumArray / Float(arr.count);
     }
     
     /* Get the max values to the left and right of the peak.
-     * The range is = to window size
+     * The range is = to window size.
+     * We skiped the element dirrectly to the left and right of the peak for better results
      */
     func getMaxes() -> (leftMax: Float,rightMax: Float) {
         //checking for index out of bounds
@@ -142,10 +170,17 @@ class AudioModel {
     }
     
     
+    /* Params: Float
+     *
+     * This method updates the sine wave with the inputed float.
+     * Also resets all calculation values to their base state.
+     * This will make us recalculate baselines.
+     */
     func changeFrequency(frequencyIn:Float) {
         //remove all old data
         rightMaxAvgBaseline.removeAll();
         leftMaxAvgBaseline.removeAll();
+        peakAvg.removeAll()
         rightMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
         leftMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
         rightBaseline = 0
@@ -166,27 +201,45 @@ class AudioModel {
         
     }
     
+    /* This method sets the baselines for the current frequency playing as well
+     * as the threshold for motion detection.
+     */
     func captureBaselines() {
         
+        //get maxes
         let maxes = getMaxes();
         
         //store max for current frame
         rightMaxAvgBaseline.append(maxes.rightMax);
         leftMaxAvgBaseline.append(maxes.leftMax);
+        
+        
+        //store peak
+        peakAvg.append(fftData[maxIndex])
 
-        //if 5 frames captured stop taking baselines
+        //if numBaselineFrames captured, stop taking baselines
         
         if(rightMaxAvgBaseline.count == numBaselineFrames && leftMaxAvgBaseline.count == numBaselineFrames){
+            //get average of the maxes over numBaselineFrames and store them in the respective baseline variables
             rightBaseline = getAvg(arr:rightMaxAvgBaseline);
             leftBaseline = getAvg(arr:leftMaxAvgBaseline);
             
+            //get average peak over numBaselineFrames (used in threshold calculation)
+            let peakBaseline = getAvg(arr: peakAvg)
+            
+            //stop capturing baselines (start detecting motion)
             self.caputringBaselines = false
             print("Right Baseline:")
             print(rightBaseline)
             print("Left Baseline:")
             print(leftBaseline)
-            leftPercentage = (fftData[maxIndex] - leftBaseline) * 0.18
-            rightPercentage = (fftData[maxIndex] - rightBaseline) * 0.23
+            
+            //set thresholds
+            //from brute force testing we found good percentages for 20k
+            //we then noticed that we needed to exponentioally decrease these percentages the lower the frequency
+            //we decrease our "baseline percentage for 20k" by .00025 * (20000/sineFreqncy) ^ 2
+            leftPercentage = (peakBaseline - leftBaseline) * (0.2003 - (0.00025 * pow((20000/sineFrequency),2)))
+            rightPercentage = (peakBaseline - rightBaseline) * (0.2525 - (0.00025 * pow((20000/sineFrequency),2)))
             print("Left percentage:")
             print(leftPercentage)
             print("Right percentage:")
@@ -195,37 +248,40 @@ class AudioModel {
         
     }
     
+    /* This method will detect motion.
+     * We decided to take an average of the maxes over numDetectionFrames number of frames.
+     * We wait numDetectionFrames till we have arrays full of maxes. Each time we get a new fft,
+     * we overwrite the oldest max with the max from the current fft and take an average of the array.
+     * we then compare our average to our baseline and if this difference exceeds the predetermined
+     * threshold in a particular direction, we will update the gesture label.
+     */
     func detectMotion() {
+        //get maxes
         let maxes = getMaxes();
         
-        //store max from current frame
+        //store max from current frame in insertMaxIndex location
         rightMaxAvg[insertMaxIndex] = maxes.rightMax;
         leftMaxAvg[insertMaxIndex] = maxes.leftMax;
-        insertMaxIndex += 1
+        insertMaxIndex += 1 //go to next location
         
-        if(insertMaxIndex == 5){
+        //if our index has reached numDetectionFrames (it is out of bounds) reset it to 0 (this will start the overwriting process)
+        if(insertMaxIndex == numDetectionFrames){
             insertMaxIndex = 0
-            startDetection = true
+            startDetection = true //start detection is initialzed as false so we will only start detecting once we have a full arr of maxes
         }
         
         if(startDetection){
-            //write algorithm for detection
+            //detection algorithm
+            
+            //get the average of the maxes
             let rightAvg = getAvg(arr:rightMaxAvg);
             let leftAvg = getAvg(arr:leftMaxAvg);
             
-//            print("Right Max Avg:")
-//            print(rightAvg)
-//            print("Left Max Avg:")
-//            print(leftAvg)
+//          used for debugging
+//            statsLeft.append(leftAvg - leftBaseline);
+//            statsRight.append(rightAvg - rightBaseline);
             
-            //((leftAvg/fftData[maxIndex])-(leftBaseline/fftData[maxIndex])).magnitude
-            
-            
-//            (leftBaseline.magnitude-leftAvg.magnitude)/(leftBaseline.magnitude-fftData[maxIndex].magnitude)
-//            (rightBaseline.magnitude-rightAvg.magnitude)/(rightBaseline.magnitude-fftData[maxIndex].magnitude)
-            statsLeft.append(leftAvg - leftBaseline);
-            statsRight.append(rightAvg - rightBaseline);
-            
+            //detect if the difference between our current avg and baseline exceeds threshold
             if(rightAvg - rightBaseline > rightPercentage){
                 print("towards")
                 gesture = "towards"
@@ -233,13 +289,8 @@ class AudioModel {
                 print("away")
                 gesture = "away"
             }else{
-                print("neutral")
                 gesture = "neutral"
             }
-            //get diff of right max avg and baseline
-            //check to see how much difference when there is no movement
-            //check to see how much difference when there is movement
-            //hopefully there is A SIGNIFICANT difference when there is movement
             
         }
         
@@ -268,6 +319,7 @@ class AudioModel {
             //   baseline: the fft in previous interval
             // the user can now use these variables however they like
             
+            //switch between capturing baselines and detecting motion
             if(caputringBaselines){
                 captureBaselines()
             }else{
