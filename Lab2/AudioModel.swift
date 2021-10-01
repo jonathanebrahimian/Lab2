@@ -17,8 +17,30 @@ class AudioModel {
     //time data
     var fftData:[Float]
     //fft data at the current moment
-    var baseline:[Float]
+    var rightMaxAvgBaseline:[Float]
+    var leftMaxAvgBaseline:[Float]
+    var rightMaxAvg:[Float]
+    var leftMaxAvg:[Float]
+    var leftBaseline:Float;
+    var rightBaseline:Float;
+    var caputringBaselines:Bool;
+    var maxIndex:Int;
+    let windowSize = 5;
+    var insertMaxIndex:Int;
+    let numDetectionFrames = 5;
+    let numBaselineFrames = 5;
+    let percentIncrease:Float = 0.2;
+    var startDetection:Bool;
+    var statsLeft:[Float] = [];
+    var statsRight:[Float] = [];
+    var rightPercentage:Float;
+    var leftPercentage:Float;
+    var gesture:String;
+    
+    
+    
     //fft data in the previous time interval
+   
     
     
     // MARK: Public Methods
@@ -27,11 +49,27 @@ class AudioModel {
         // anything not lazily instatntiated should be allocated here
         timeData = Array.init(repeating: 0.0, count: BUFFER_SIZE)
         fftData = Array.init(repeating: 0.0, count: BUFFER_SIZE/2)
-        baseline = Array.init(repeating: 0.0, count: BUFFER_SIZE/2)
+        rightMaxAvgBaseline = Array()
+        leftMaxAvgBaseline = Array()
+        rightMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
+        leftMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
+        rightBaseline = 0
+        leftBaseline = 0
+        caputringBaselines = true
+        startDetection = false
+        maxIndex = 0
+        insertMaxIndex = 0
+        rightPercentage = 0
+        leftPercentage = 0
+        gesture = "neutral"
+        
+        
     }
     
     func startProcessingSinewaveForPlayback(withFreq:Float=330.0){
         sineFrequency = withFreq
+        
+        maxIndex = Int((Float(sineFrequency) * Float(BUFFER_SIZE ) / Float(Novocaine.audioManager().samplingRate)).rounded());
         // Two examples are given that use either objective c or that use swift
         //   the swift code for loop is slightly slower thatn doing this in c,
         //   but the implementations are very similar
@@ -81,128 +119,141 @@ class AudioModel {
                                    andBufferSize: Int64(BUFFER_SIZE))
     }()
     
-    func setBaseline(){
-        baseline = fftData
+    func getAvg(arr: [Float]) -> Float{
+        let sumArray = arr.reduce(0, +);
+        return sumArray / Float(arr.count);
     }
     
-    func detectMovement()-> String{
-        //here is where we start detecting movment
-        //let me explain how this work
-        //first we calculate the max index by the equation
-        //current freq * n(buffer size) / Fs(sampling rate)
-        //take the int floor of this
-        //then we take the average left and right of upto 5 elements next to the max
-        //in both baseline and fftdata
-        //then we find the percent left change and right change by
-        //average left/right change fft - average left/right change baseline
-        //we compare these changes to a threshold,
-        //according to larson in class left threshold will be slightly lower than
-        //right threshold due to noises and decreasing frequency 
-        
-        var maxIndex:Int = Int(sineFrequency) * BUFFER_SIZE / 2 / Int(Novocaine.audioManager().samplingRate);
-        //calculate max index by k = Freq * n / Fs
-        print("MAX INDEX")
-        print(maxIndex)
-        
-        //these are the variables for counting the average freq at the left and right of the max index
-        var leftcounter = maxIndex - 1
-        var rightcounter = maxIndex + 1
-        var averageLeftFFT:Float = 0
-        var averageRightFFT:Float = 0
-        var loopcounter = 1
-        
-        //the code below calculates the average of upto 5 elements left/right to the max in fft data to compare it with baseline data
-        
-        while(leftcounter >= 0){
-            averageLeftFFT = averageLeftFFT + fftData[leftcounter]
-            loopcounter += 1
-            leftcounter -= 1
-            if(loopcounter > 5){
-                break
-            }
-        }
-        
-        averageLeftFFT = averageLeftFFT / Float(loopcounter)
-        //take the average
-        
-        loopcounter = 1
-        
-        //calculate the average in the right  5 element of fft max
-        while(rightcounter < fftData.count){
-            averageRightFFT = averageRightFFT + fftData[rightcounter]
-            loopcounter += 1
-            rightcounter += 1
-            if(loopcounter > 5){
-                break
-            }
-        }
-        
-        averageRightFFT = averageRightFFT / Float(loopcounter)
-        
-        //now we calculate the left and right average in baseline
-        //same logic with fft except different data
-        leftcounter = maxIndex - 1
-        rightcounter = maxIndex + 1
-        var averageLeftBaseline:Float = 0
-        var averageRightBaseline:Float = 0
-        loopcounter = 1
-        
-        while(leftcounter >= 0){
-            averageLeftBaseline += baseline[leftcounter]
-            loopcounter += 1
-            leftcounter -= 1
-            if(loopcounter > 5){
-                break
-            }
-        }
-        
-        averageLeftBaseline = averageLeftBaseline / Float(loopcounter)
-        
-        loopcounter = 1
-        while(rightcounter < baseline.count){
-            averageRightBaseline = averageRightBaseline + baseline[rightcounter]
-            loopcounter += 1
-            rightcounter += 1
-            if(loopcounter > 5){
-                break
-            }
-        }
-        
-        averageRightBaseline = averageRightBaseline / Float(loopcounter)
-        
-        // here we calculate the percent change in both left and right
-        var percentLeftChange: Float = averageLeftFFT - averageLeftBaseline
-        
-        var percentRightChange: Float = averageRightFFT - averageRightBaseline
+    /* Get the max values to the left and right of the peak.
+     * The range is = to window size
+     */
+    func getMaxes() -> (leftMax: Float,rightMax: Float) {
+        //checking for index out of bounds
+        let leftBottom = max(maxIndex-windowSize-2,0);
+        let leftTop = max(maxIndex-2,0);
+        let rightTop = min(maxIndex+windowSize+2,fftData.count-1);
+        let rightBottom = min(maxIndex+2,fftData.count-1);
         
 
-
+        //get max to left and right
+        let leftMax = fftData[leftBottom...leftTop].max();
+        let rightMax = fftData[rightBottom...rightTop].max();
+        return (leftMax!, rightMax!);
+    }
+    
+    
+    func changeFrequency(frequencyIn:Float) {
+        //remove all old data
+        rightMaxAvgBaseline.removeAll();
+        leftMaxAvgBaseline.removeAll();
+        rightMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
+        leftMaxAvg =  Array.init(repeating: 0.0, count: numDetectionFrames)
+        rightBaseline = 0
+        leftBaseline = 0
+        caputringBaselines = true
+        startDetection = false
+        insertMaxIndex = 0
+        rightPercentage = 0
+        leftPercentage = 0
+        gesture = "neutral"
         
-        print("percentage increase in baseline left")
-        print(percentLeftChange)
-        print("percentage increase in baseline right")
-        print(percentRightChange)
+        //set new frequency
+        sineFrequency = frequencyIn
         
-        //here we define a threshold to see whether they are gestuing toward or away 
-        //left threshold will be slightly lower because of noises
-        if(percentLeftChange > 6 && percentRightChange < 6){
-            return "Away"
-        }
-        else if (percentRightChange > 6 && percentLeftChange < 6){
-            return "Toward"
-        }
-        
-        return "Neutral"
-        
-        
+        //compute new peak index
+        maxIndex = Int((Float(sineFrequency) * Float(BUFFER_SIZE ) / Float(Novocaine.audioManager().samplingRate)).rounded());
         
         
     }
     
+    func captureBaselines() {
+        
+        let maxes = getMaxes();
+        
+        //store max for current frame
+        rightMaxAvgBaseline.append(maxes.rightMax);
+        leftMaxAvgBaseline.append(maxes.leftMax);
+
+        //if 5 frames captured stop taking baselines
+        
+        if(rightMaxAvgBaseline.count == numBaselineFrames && leftMaxAvgBaseline.count == numBaselineFrames){
+            rightBaseline = getAvg(arr:rightMaxAvgBaseline);
+            leftBaseline = getAvg(arr:leftMaxAvgBaseline);
+            
+            self.caputringBaselines = false
+            print("Right Baseline:")
+            print(rightBaseline)
+            print("Left Baseline:")
+            print(leftBaseline)
+            leftPercentage = (fftData[maxIndex] - leftBaseline) * 0.18
+            rightPercentage = (fftData[maxIndex] - rightBaseline) * 0.23
+            print("Left percentage:")
+            print(leftPercentage)
+            print("Right percentage:")
+            print(rightPercentage)
+        }
+        
+    }
+    
+    func detectMotion() {
+        let maxes = getMaxes();
+        
+        //store max from current frame
+        rightMaxAvg[insertMaxIndex] = maxes.rightMax;
+        leftMaxAvg[insertMaxIndex] = maxes.leftMax;
+        insertMaxIndex += 1
+        
+        if(insertMaxIndex == 5){
+            insertMaxIndex = 0
+            startDetection = true
+        }
+        
+        if(startDetection){
+            //write algorithm for detection
+            let rightAvg = getAvg(arr:rightMaxAvg);
+            let leftAvg = getAvg(arr:leftMaxAvg);
+            
+//            print("Right Max Avg:")
+//            print(rightAvg)
+//            print("Left Max Avg:")
+//            print(leftAvg)
+            
+            //((leftAvg/fftData[maxIndex])-(leftBaseline/fftData[maxIndex])).magnitude
+            
+            
+//            (leftBaseline.magnitude-leftAvg.magnitude)/(leftBaseline.magnitude-fftData[maxIndex].magnitude)
+//            (rightBaseline.magnitude-rightAvg.magnitude)/(rightBaseline.magnitude-fftData[maxIndex].magnitude)
+            statsLeft.append(leftAvg - leftBaseline);
+            statsRight.append(rightAvg - rightBaseline);
+            
+            if(rightAvg - rightBaseline > rightPercentage){
+                print("towards")
+                gesture = "towards"
+            }else if(leftAvg - leftBaseline > leftPercentage){
+                print("away")
+                gesture = "away"
+            }else{
+                print("neutral")
+                gesture = "neutral"
+            }
+            //get diff of right max avg and baseline
+            //check to see how much difference when there is no movement
+            //check to see how much difference when there is movement
+            //hopefully there is A SIGNIFICANT difference when there is movement
+            
+        }
+        
+        
+
+        
+        
+    }
+    
+
     @objc
     private func runEveryInterval(){
         if inputBuffer != nil {
-            baseline = fftData
+           
             // copy time data to swift array
             self.inputBuffer!.fetchFreshData(&timeData,
                                              withNumSamples: Int64(BUFFER_SIZE))
@@ -217,6 +268,12 @@ class AudioModel {
             //   baseline: the fft in previous interval
             // the user can now use these variables however they like
             
+            if(caputringBaselines){
+                captureBaselines()
+            }else{
+                detectMotion()
+            }
+            
         }
     }
     
@@ -229,6 +286,7 @@ class AudioModel {
         if let manager = self.audioManager {
             manager.pause()
             manager.outputBlock = nil
+            manager.inputBlock = nil
         }
     }
     

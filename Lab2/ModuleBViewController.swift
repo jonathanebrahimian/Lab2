@@ -19,27 +19,26 @@ class ModuleBViewController: UIViewController {
     lazy var graph:MetalGraph? = {
         return MetalGraph(mainView: self.view)
     }()
+    @IBOutlet weak var frequencySlider: UISlider!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // start up the audio model here, querying microphone
         audio.startMicrophoneProcessing(withFps: 10)
-        audio.startProcessingSinewaveForPlayback(withFreq: 1000)
+        audio.startProcessingSinewaveForPlayback(withFreq: 20000)
         audio.play()
+        frequencySlider.value = 20000
+        
+        
         
         // Do any additional setup after loading the view.
     }
-    var timer = Timer()
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         graph?.addGraph(withName: "fft",
                         shouldNormalize: true,
                         numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
-
-        graph?.addGraph(withName: "baseline",
-                        shouldNormalize: true,
-                        numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
-        
         
         graph?.addGraph(withName: "time",
             shouldNormalize: false,
@@ -52,9 +51,8 @@ class ModuleBViewController: UIViewController {
             repeats: true)
         //the above function update graphs
         //the below function detect gesture movements
-        self.timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true, block: { _ in
-            self.detectMovements()
-        })
+
+       
        
     }
 //
@@ -63,8 +61,12 @@ class ModuleBViewController: UIViewController {
         super.viewWillDisappear(animated)
         audio.pause()
         
+    
     }
     
+    
+   
+ 
     @IBOutlet weak var freqLabel: UILabel!
     
 
@@ -73,7 +75,7 @@ class ModuleBViewController: UIViewController {
     
     @IBAction func changeFrequency(_ sender: UISlider) {
         //change frequency
-        self.audio.sineFrequency = sender.value
+        self.audio.changeFrequency(frequencyIn: sender.value)
         freqLabel.text = "Frequency: \(sender.value)"
     }
     
@@ -89,10 +91,6 @@ class ModuleBViewController: UIViewController {
     @objc
     func updateGraph(){
         self.graph?.updateGraph(
-            data: self.audio.baseline,
-            forKey: "baseline"
-        )
-        self.graph?.updateGraph(
             data: self.audio.fftData,
             forKey: "fft"
         )
@@ -101,15 +99,11 @@ class ModuleBViewController: UIViewController {
             data: self.audio.timeData,
             forKey: "time"
         )
+        
+        DispatchQueue.main.async {
+            self.gestureType.text = self.audio.gesture
+        }
    
-    }
-    
-    
-    func detectMovements(){
-        //update gesture type according to the frequency
-        var gesturetype = audio.detectMovement()
-        //update label on main queue
-        updateGestureLabel(status: gesturetype)
     }
     
 }

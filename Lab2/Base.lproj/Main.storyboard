@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="dg3-Sl-Fk7">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -127,13 +128,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1000" minValue="15" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="Srk-WC-YcI">
+                            <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="20000" minValue="15" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="Srk-WC-YcI">
                                 <rect key="frame" x="57" y="582.5" width="298" height="31"/>
                                 <connections>
                                     <action selector="changeFrequency:" destination="Zi3-ag-Yij" eventType="valueChanged" id="b3t-De-eiA"/>
                                 </connections>
                             </slider>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Frequency: 1000" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ulb-7p-vTL">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Frequency: 20000" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ulb-7p-vTL">
                                 <rect key="frame" x="82" y="462" width="249" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -163,6 +164,7 @@
                     <navigationItem key="navigationItem" id="XXk-tH-g7d"/>
                     <connections>
                         <outlet property="freqLabel" destination="Ulb-7p-vTL" id="2Qs-rp-pKb"/>
+                        <outlet property="frequencySlider" destination="Srk-WC-YcI" id="4Rx-aa-C4h"/>
                         <outlet property="gestureType" destination="CfK-r6-BGk" id="W8f-aL-4cg"/>
                     </connections>
                 </viewController>
