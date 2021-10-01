@@ -22,6 +22,12 @@ class ModuleAViewController: UIViewController {
 
     var didLock: Bool = false
     var useLock: Bool = false
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.tone1Label.text = " "
+        self.tone2Label.text = " "
+    }
 
     // play
     override func viewDidAppear(_ animated: Bool) {
@@ -33,8 +39,8 @@ class ModuleAViewController: UIViewController {
             (freq1: Float, freq2: Float) -> Void in
 
             func setText() {
-                self.tone1Label.text = freq1 < 0 ? "" : String(format: "%.2f Hz", freq1)
-                self.tone2Label.text = freq2 < 0 ? "" : String(format: "%.2f Hz", freq2)
+                self.tone1Label.text = freq1 < 0 ? " " : String(format: "%.2f Hz", freq1)
+                self.tone2Label.text = freq2 < 0 ? " " : String(format: "%.2f Hz", freq2)
             }
 
             if self.useLock {

@@ -243,7 +243,7 @@ class AudioModel {
             //from brute force testing we found good percentages for 20k
             //we then noticed that we needed to exponentioally decrease these percentages the lower the frequency
             //we decrease our "baseline percentage for 20k" by .00025 * (20000/sineFreqncy) ^ 2
-            leftPercentage = (peakBaseline - leftBaseline) * (0.2003 - (0.00025 * pow((20000 / sineFrequency), 2)))
+            leftPercentage = (peakBaseline - leftBaseline) * (0.2003 - (0.0025 * pow((20000 / sineFrequency), 2)))
             rightPercentage = (peakBaseline - rightBaseline) * (0.2525 - (0.00025 * pow((20000 / sineFrequency), 2)))
             print("Left percentage:")
             print(leftPercentage)
