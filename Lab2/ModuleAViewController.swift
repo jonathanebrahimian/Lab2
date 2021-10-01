@@ -23,12 +23,6 @@ class ModuleAViewController: UIViewController {
     var didLock: Bool = false
     var useLock: Bool = false
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        tone1Label.text = String(audio.firstPeak)
-    }
-
     // play
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
