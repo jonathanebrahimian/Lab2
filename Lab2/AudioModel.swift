@@ -20,6 +20,9 @@ class AudioModel {
     var firstPeak: Float = -1
     var secondPeak: Float = -1
 
+    // for updating labels within MVC paradigm
+    var updateLabels: ((Float, Float) -> Void)? = nil
+
     // gets set when setting mic up
     var deltaFreq: Float = 0
 
@@ -112,21 +115,21 @@ class AudioModel {
             //   fftData:  the FFT of those same samples
             // the user can now use these variables however they like
 
-            var peaks: [Float] = [] // magnitudes of peak in fft
+            var peaks: [Float] = [] //  magnitudes of peak in fft
             var peakIndexes: [Int] = [] // indexes of peak in fft
 
             // find peaks using sliding window of size 5
             for i in 1...fftData.count - 6
             {
                 // if peak is in center & > -1
-                if fftData[i + 3] > 3 && fftData[i...(i + 5)].max() == fftData[i + 3]
+                if fftData[i + 3] > 5 && fftData[i...(i + 5)].max() == fftData[i + 3]
                 {
                     peaks.append(fftData[i + 3])
                     peakIndexes.append(i + 3)
                 }
             }
 
-            // calculates frequency with interpolation
+            // calculates frequency from index, with interpolation
             func getFrequency(peakIndex: Int) -> Float
             {
                 let peakFreq = deltaFreq * Float(peakIndex)
@@ -140,7 +143,10 @@ class AudioModel {
                 firstPeak = getFrequency(peakIndex: peakIndexes[0])
                 secondPeak = -1
             }
+            // if we have multiple valid peaks
             else if peakIndexes.count > 1 {
+                
+                // for finding largest 2
                 var largestA: Float = -MAXFLOAT
                 var largestAIndex: Int = -1
                 var largestB: Float = -MAXFLOAT
@@ -165,90 +171,12 @@ class AudioModel {
                 secondPeak = getFrequency(peakIndex: peakIndexes[largestBIndex])
             }
             // if no peaks
-                else {
+            else {
                 firstPeak = -1
                 secondPeak = -1
             }
 
-            print(firstPeak, secondPeak)
-
-
-//            if peakIndexes.count > 2, let audioManager = audioManager {
-//
-//
-//                var peakMag: Float = .nan
-//                var peakIndex: vDSP_Length = 0
-//
-//                vDSP_maxvi(peaks, vDSP_Stride(1), &peakMag, &peakIndex, vDSP_Length(peaks.count))
-//
-//                let k = peakIndexes[Int(peakIndex)]
-//                let deltaFreq = Float(audioManager.samplingRate) / Float(BUFFER_SIZE)
-//                let peakFreq = deltaFreq * Float(k)
-//                let quadApprox = (fftData[k - 1] - fftData[k + 1]) / (fftData[k + 1] - 2 * fftData[k] + fftData[k - 1])
-//
-//                firstPeak = Float(peakFreq + quadApprox * deltaFreq * 0.5)
-//            } else {
-//                firstPeak = -1
-//            }
-
-            // here we find the single peak for mod B
-            let stride = vDSP_Stride(1)
-            let n = vDSP_Length(fftData.count)
-            var c: Float = .nan
-            var i: vDSP_Length = 0
-            vDSP_maxvi(fftData,
-                       stride,
-                           &c,
-                           &i,
-                       n)
-
-//            print("max", c, "index", i)
-//            c is the max element and i is the index
-//            here we find the starting point of peak data
-//            within fft data
-//            our goal is to find the peak and equal amount of data to the left and right
-
-//            var startarr = Int(i) - peakData.count/2
-//            var endarr = Int(i) + peakData.count*2
-//            var startdiff = 0
-//            var enddiff = 0
-//            if(startarr < 0){
-//                startdiff = abs(startarr)
-//                startarr = 0
-//            }
-//            if(endarr > peakData.count){
-//                enddiff = abs(enddiff)
-//                endarr = peakData.count
-//            }
-//            peakData = Array(fftData[startarr...endarr])
-
-            var leftcounter = Int(i)
-            var rightcounter = Int(i)
-            let peakMid = peakData.count / 2
-            peakData[peakMid] = c
-            var peakleftcounter = peakMid - 1
-            var peakrightcounter = peakMid + 1
-
-            while(leftcounter >= 0 && peakleftcounter >= 0) {
-                peakData[peakleftcounter] = fftData[leftcounter]
-                leftcounter = leftcounter - 1
-                peakleftcounter = peakleftcounter - 1
-            }
-            while(peakleftcounter >= 0 && leftcounter == 0) {
-                peakData[peakleftcounter] = fftData[0]
-                peakleftcounter = peakleftcounter - 1
-            }
-
-            while(rightcounter < fftData.count && peakrightcounter < peakData.count) {
-                peakData[peakrightcounter] = fftData[rightcounter]
-                peakrightcounter = peakrightcounter + 1
-                rightcounter = rightcounter + 1
-            }
-
-            while(rightcounter >= fftData.count && peakrightcounter < peakData.count) {
-                peakData[peakrightcounter] = fftData[fftData.count - 1]
-                peakrightcounter = peakrightcounter + 1
-            }
+            updateLabels!(firstPeak, secondPeak)
         }
     }
 

@@ -19,10 +19,13 @@ class ModuleAViewController: UIViewController {
     @IBOutlet weak var tone1Label: UILabel!
     @IBOutlet weak var tone2Label: UILabel!
     @IBOutlet weak var lockInButton: UIButton!
-    
+
+    var didLock: Bool = false
+    var useLock: Bool = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         tone1Label.text = String(audio.firstPeak)
     }
 
@@ -31,6 +34,29 @@ class ModuleAViewController: UIViewController {
         super.viewDidAppear(animated)
 
         audio.play(forModule: "a")
+
+        audio.updateLabels = {
+            (freq1: Float, freq2: Float) -> Void in
+
+            func setText() {
+                self.tone1Label.text = freq1 < 0 ? "" : String(format: "%.2f Hz", freq1)
+                self.tone2Label.text = freq2 < 0 ? "" : String(format: "%.2f Hz", freq2)
+            }
+
+            if self.useLock {
+                // ensure valid frequency & haven't locked in yet
+                if (freq1 > 0 || freq2 > 0) && !self.didLock
+                {
+                    self.didLock = true
+                    setText()
+                }
+            }
+            else
+            {
+                self.didLock = false
+                setText()
+            }
+        }
     }
 
     // pause
@@ -41,5 +67,8 @@ class ModuleAViewController: UIViewController {
     }
 
     @IBAction func lockInClicked(_ sender: Any) {
+        useLock.toggle()
+
+        lockInButton.setTitle(useLock ? "Unlock" : "Lock in", for: .normal)
     }
 }
