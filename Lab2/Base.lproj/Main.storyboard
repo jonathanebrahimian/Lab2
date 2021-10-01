@@ -61,7 +61,7 @@
             </objects>
             <point key="canvasLocation" x="1131.8840579710145" y="-35.491071428571423"/>
         </scene>
-        <!--Root View Controller-->
+        <!--Lab 2-->
         <scene sceneID="Zsa-li-0cO">
             <objects>
                 <tableViewController id="lnT-9j-Qvz" customClass="ViewController" customModule="Lab2" customModuleProvider="target" sceneMemberID="viewController">
@@ -120,7 +120,7 @@
                             <outlet property="delegate" destination="lnT-9j-Qvz" id="NJW-zY-3Gr"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="juF-X8-Pg6"/>
+                    <navigationItem key="navigationItem" title="Lab 2" id="juF-X8-Pg6"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QwC-Z0-yDT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
