@@ -22,7 +22,8 @@
 			</array>
 		</dict>
 	</dict>
+
     <key>NSMicrophoneUsageDescription</key>
-    <string>Need microphone access for uploading videos</string>
+    <string>Need microphone access for finding sine frequencies</string>
 </dict>
 </plist>

@@ -38,6 +38,9 @@ class ModuleBViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        audio.play(forModule: "b")
+        
         graph?.addGraph(withName: "fft",
                         shouldNormalize: true,
                         numPointsInGraph: AudioConstants.AUDIO_BUFFER_SIZE/2)
@@ -58,8 +61,6 @@ class ModuleBViewController: UIViewController {
         //pause the audio upon dismissing the view
         super.viewWillDisappear(animated)
         audio.pause()
-        
-    
     }
     
     
