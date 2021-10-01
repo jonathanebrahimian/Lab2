@@ -28,7 +28,7 @@ class ModuleBViewController: UIViewController {
         audio.startMicrophoneProcessing(withFps: 10)
         //start at freq 20k
         audio.startProcessingSinewaveForPlayback(withFreq: 20000)
-        audio.play()
+        audio.play(forModule: "b")
         frequencySlider.value = 20000 //start at freq 20k
         
         
