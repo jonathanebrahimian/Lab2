@@ -109,18 +109,7 @@ class AudioModel {
 
         if let manager = self.audioManager {
             startMicrophoneProcessing(withFps: 10)
-
-            if currentModule == "a"
-            {
-                // do things for module a
-
-            } else if currentModule == "b"
-            {
-                startProcessingSinewaveForPlayback(withFreq: 1000)
-            }
-
             manager.play()
-            
         }
     }
 
