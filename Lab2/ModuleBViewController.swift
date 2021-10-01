@@ -23,19 +23,16 @@ class ModuleBViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // start up the audio model here, querying microphone
-
-        audio.startMicrophoneProcessing(withFps: 10)
+        
         //start at freq 20k
         audio.startProcessingSinewaveForPlayback(withFreq: 20000)
         audio.play(forModule: "b")
+        
         frequencySlider.value = 20000 //start at freq 20k
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        audio.play(forModule: "b")
 
         graph?.addGraph(withName: "fft",
                         shouldNormalize: true,
@@ -52,7 +49,13 @@ class ModuleBViewController: UIViewController {
                              repeats: true)
 
     }
-//
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        audio.changeFrequency(frequencyIn: 20000)
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         //pause the audio upon dismissing the view
         super.viewWillDisappear(animated)
